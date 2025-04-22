@@ -1,19 +1,19 @@
 ---
 jupyter:
   jupytext:
-    formats: md:markdown
+    formats: ipynb,md
     text_representation:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.16.0
+      jupytext_version: 1.16.7
   kernelspec:
-    display_name: Python 3
+    display_name: Python 3 (ipykernel)
     language: python
     name: python3
 ---
 
-```python
+```python jupyter={"source_hidden": true}
 from IPython.display import HTML
 
 # Defining custom styling for our notebook components
@@ -96,7 +96,7 @@ code {
 ''')
 ```
 
-# MIND CRAFT: Building Intelligent Agents with Memory & Knowledge
+# Building Intelligent Agents with Memory & Knowledge
 
 Welcome to the first section of our crash course on developing intelligent agent systems. This notebook is your guide to understanding and implementing the fundamental building blocks of modern AI agents.
 
@@ -108,7 +108,7 @@ This crash course will take you on a journey from understanding the core concept
 By the end of this course, you'll be able to design, implement, and evaluate advanced AI agent systems that effectively utilize knowledge retrieval and memory to solve real-world problems.
 </div>
 
-```python
+```python jupyter={"source_hidden": true}
 # Quick setup to ensure our custom blocks display correctly in the notebook
 from IPython.display import Markdown, display
 
@@ -141,7 +141,7 @@ Let's begin by exploring the fundamental definitions and relationships between k
 
 ### Knowledge in AI Systems
 
-```python
+```python jupyter={"source_hidden": true}
 show_definition("<strong>Knowledge</strong>: Information that AI systems can access and utilize to perform tasks, answer questions, and make decisions. It represents the \"what\" of AI understanding - facts, concepts, and relationships that the system knows about the world.")
 ```
 
@@ -149,7 +149,7 @@ show_definition("<strong>Knowledge</strong>: Information that AI systems can acc
 
 AI systems access knowledge through two primary mechanisms:
 
-```python
+```python jupyter={"source_hidden": true}
 show_grid([
     """<h4>Parametric Knowledge</h4>
     Information encoded directly within the model's weights during training. This knowledge is "baked into" the model itself.""",
@@ -161,7 +161,7 @@ show_grid([
 
 ##### Parametric Knowledge
 
-```python
+```python jupyter={"source_hidden": true}
 show_explanation("""<strong>Characteristics of Parametric Knowledge:</strong>
 <ul>
 <li>Stored within the model's parameters (weights and biases)</li>
@@ -176,7 +176,7 @@ For example, when a large language model (LLM) knows that "Paris is the capital 
 
 ##### Non-Parametric Knowledge
 
-```python
+```python jupyter={"source_hidden": true}
 show_explanation("""<strong>Characteristics of Non-Parametric Knowledge:</strong>
 <ul>
 <li>Stored in external systems (databases, knowledge graphs, documents)</li>
@@ -193,7 +193,7 @@ When an AI system looks up current weather data or retrieves information from a 
 
 How knowledge is represented significantly impacts how AI systems can use it. Common knowledge representation methods include:
 
-```python
+```python jupyter={"source_hidden": true}
 show_grid([
     """<h4>Vector Embeddings</h4>
     Represent concepts, words, or documents as numerical vectors in a high-dimensional space, where semantic similarity is captured by vector proximity.""",
@@ -234,7 +234,7 @@ import json
 print(json.dumps(graph, indent=2))
 ```
 
-```python
+```python jupyter={"source_hidden": true}
 show_resources("""<strong>Key Resources on Knowledge in AI:</strong>
 <ul>
 <li><a href="https://medium.com/towards-data-science/knowledge-retrieval-takes-center-stage-183be733c6e8" target="_blank">Gadi Singer's "Knowledge Retrieval Takes Center Stage"</a> explores the shift from parametric to retrieval-centric models</li>
@@ -245,7 +245,7 @@ show_resources("""<strong>Key Resources on Knowledge in AI:</strong>
 
 ### Memory in AI Agents
 
-```python
+```python jupyter={"source_hidden": true}
 show_definition("<strong>Memory</strong>: An AI system's ability to store and recall past experiences, interactions, or computational states to maintain context and influence future behavior. Memory enables persistence and continuity in AI systems.")
 ```
 
@@ -253,7 +253,7 @@ show_definition("<strong>Memory</strong>: An AI system's ability to store and re
 
 While knowledge and memory are related concepts, they serve different functions in AI systems:
 
-```python
+```python jupyter={"source_hidden": true}
 show_explanation("""<strong>Knowledge vs. Memory:</strong>
 <ul>
 <li><strong>Knowledge</strong> is about factual information and understanding of concepts (the "what")</li>
@@ -269,7 +269,7 @@ This distinction becomes particularly important when designing AI systems that n
 
 AI systems implement several forms of memory, inspired by human cognitive systems:
 
-```python
+```python jupyter={"source_hidden": true}
 show_grid([
     """<h4>Short-term Memory (Working Memory)</h4>
     Temporary storage for ongoing conversations or tasks, typically limited in scope and duration.""",
@@ -287,7 +287,7 @@ show_grid([
 
 ##### Implementation Approaches
 
-```python
+```python jupyter={"source_hidden": true}
 show_grid([
     """<h5>Short-term Memory</h5>
     <ul>
@@ -323,7 +323,7 @@ show_grid([
 
 Memory capabilities are essential for creating persistent, context-aware AI agents:
 
-```python
+```python jupyter={"source_hidden": true}
 show_grid([
     """<strong>Continuity</strong><br>Enables coherent multi-turn interactions""",
     """<strong>Personalization</strong><br>Allows agents to adapt to individual users over time""",
@@ -333,7 +333,7 @@ show_grid([
 ], columns=3)
 ```
 
-```python
+```python jupyter={"source_hidden": true}
 show_resources("""<strong>Key Resources on Memory in AI:</strong>
 <ul>
 <li><a href="https://www.ibm.com/think/topics/ai-agent-memory" target="_blank">IBM's comprehensive guide on "What Is AI Agent Memory?"</a> explores different memory types and implementations</li>
@@ -344,7 +344,7 @@ show_resources("""<strong>Key Resources on Memory in AI:</strong>
 
 ### Agents in Generative AI
 
-```python
+```python jupyter={"source_hidden": true}
 show_definition("<strong>Agents</strong>: Autonomous systems that perceive their environment, make decisions, and take actions to achieve specific goals. AI agents use generative models as their reasoning engine while incorporating additional capabilities for interaction and task completion.")
 ```
 
@@ -352,7 +352,7 @@ show_definition("<strong>Agents</strong>: Autonomous systems that perceive their
 
 Modern AI agents typically consist of several interdependent components:
 
-```python
+```python jupyter={"source_hidden": true}
 show_grid([
     """<h4>1. Perception</h4>
     Mechanisms for receiving and processing input from the environment or users.<br><br>
@@ -376,7 +376,7 @@ show_grid([
 
 The progression from simple language models to agentic systems represents a significant evolution in AI capabilities:
 
-```python
+```python jupyter={"source_hidden": true}
 show_grid([
     """<h4>Stage 1: Basic Language Models</h4>
     Generate text based on prompts without agency or persistence.
@@ -410,7 +410,7 @@ show_grid([
 ], columns=2)
 ```
 
-```python
+```python jupyter={"source_hidden": true}
 show_resources("""<strong>Key Resources on AI Agents:</strong>
 <ul>
 <li><a href="https://www.ibm.com/think/topics/agentic-reasoning" target="_blank">IBM's "What Is Agentic Reasoning?"</a> provides insights into the decision-making capabilities of agents</li>
@@ -423,7 +423,7 @@ show_resources("""<strong>Key Resources on AI Agents:</strong>
 
 These three concepts are deeply interconnected in advanced AI systems:
 
-```python
+```python jupyter={"source_hidden": true}
 show_grid([
     """<strong>Knowledge</strong> provides the information foundation upon which agents operate""",
     """<strong>Memory</strong> creates persistence and learning capabilities across interactions""",
@@ -440,7 +440,7 @@ Together, they form the foundation for building sophisticated AI systems that ca
 - **Agents** are autonomous systems that combine perception, reasoning, memory, and action capabilities to accomplish goals
 - These three components form the foundation of advanced AI systems, with each playing a critical role in overall system capabilities
 
-```python
+```python jupyter={"source_hidden": true}
 show_resources("""<strong>Further Reading:</strong>
 <ul>
 <li><a href="https://diamantai.substack.com/p/building-an-ai-agent-with-memory" target="_blank">"Building an AI Agent with Memory and Adaptability" - DiamantAI</a></li>
@@ -453,3 +453,11 @@ show_resources("""<strong>Further Reading:</strong>
 ## Next Steps
 
 In the following sections, we'll explore these concepts in greater depth, focusing on implementation approaches for knowledge retrieval systems, memory architectures, and agentic frameworks using LangGraph and related technologies.
+
+```python
+
+```
+
+```python
+
+```
