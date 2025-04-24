@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>rag_architectures_quiz.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="advanced-rag-architectures-quiz">Advanced RAG Architectures: Quiz</h1>
+<p>Student Name: Sai Surya Madhav Rebbapragada
+
+<br>
+NEU ID:002201472
+
+<br>
+Topic: Advanced Retrieval-Augmented Generation (RAG) Architectures</p>
+<h2 id="overview">Overview</h2>
+<p>This quiz covers key concepts from the Advanced RAG Architectures notebook, focusing on different RAG implementations, evaluation metrics, and practical applications.</p>
+<h2 id="questions">Questions</h2>
+<h3 id="question-1-recall">Question 1 [Recall]</h3>
+<p><strong>What is the primary purpose of Retrieval-Augmented Generation (RAG) in AI systems?</strong></p>
+<p>A) To reduce the training time of language models<br>
+B) To ground language model responses in external knowledge sources<br>
+C) To enable language models to write their own training data<br>
+D) To eliminate the need for large language models entirely</p>
+<p><strong>Correct Answer: B</strong></p>
+<p><strong>Explanation:</strong> Retrieval-Augmented Generation (RAG) enhances language models by connecting them to external knowledge sources, allowing them to retrieve relevant information before generating responses. This helps ground their answers in factual information, reducing hallucinations and improving accuracy.</p>
+<h3 id="question-2-recall">Question 2 [Recall]</h3>
+<p><strong>Which of the following is NOT one of the core components of a standard RAG system?</strong></p>
+<p>A) Document Collection<br>
+B) Retriever<br>
+C) Generator<br>
+D) Retrainer</p>
+<p><strong>Correct Answer: D</strong></p>
+<p><strong>Explanation:</strong> Standard RAG systems typically consist of document collection (the corpus of knowledge), document processing (converting documents into a suitable format), retriever (finding relevant information based on a query), generator (usually an LLM that creates a response), and an orchestration layer. &quot;Retrainer&quot; is not a standard component.</p>
+<h3 id="question-3-recall">Question 3 [Recall]</h3>
+<p><strong>In the RAGAS evaluation framework, what does the 'Faithfulness' metric measure?</strong></p>
+<p>A) How well the generated response matches the user's query<br>
+B) How well the retrieved documents match the user's query<br>
+C) Whether the generated response contains only information from the retrieved documents<br>
+D) The factual accuracy of the retrieved documents</p>
+<p><strong>Correct Answer: C</strong></p>
+<p><strong>Explanation:</strong> Faithfulness measures whether the generated response contains only information that can be derived from the retrieved documents. It detects hallucinations and unsupported statements by calculating the ratio of claims in the response that are supported by the retrieved context to the total number of claims.</p>
+<h3 id="question-4-recall">Question 4 [Recall]</h3>
+<p><strong>What is the key innovation that Corrective RAG (CRAG) introduces compared to Simple RAG?</strong></p>
+<p>A) It uses multiple language models instead of just one<br>
+B) It evaluates the quality of retrieved documents before generating a response<br>
+C) It always uses web search instead of a vector database<br>
+D) It can generate responses without any external knowledge</p>
+<p><strong>Correct Answer: B</strong></p>
+<p><strong>Explanation:</strong> Corrective RAG (CRAG) introduces a self-assessment loop to evaluate the quality and relevance of retrieved documents before generation. It can grade documents, filter irrelevant content, and trigger fallback mechanisms like web search if the initially retrieved documents are insufficient or irrelevant.</p>
+<h3 id="question-5-recall">Question 5 [Recall]</h3>
+<p><strong>Which RAG architecture dynamically routes queries through different processing paths based on the query type?</strong></p>
+<p>A) Simple RAG<br>
+B) CRAG<br>
+C) Adaptive RAG<br>
+D) Self-RAG</p>
+<p><strong>Correct Answer: C</strong></p>
+<p><strong>Explanation:</strong> Adaptive RAG analyzes the query to determine its complexity and type, then routes it through the most appropriate processing path. This might include direct LLM generation for simple queries, standard retrieval for factual questions, or more complex paths like multi-hop retrieval for complex queries requiring information synthesis.</p>
+<h3 id="question-6-recall">Question 6 [Recall]</h3>
+<p><strong>What is the primary benefit of using RAGAS for evaluating RAG systems?</strong></p>
+<p>A) It's faster than human evaluation<br>
+B) It provides objective metrics across multiple dimensions of RAG performance<br>
+C) It's integrated with all major LLM providers<br>
+D) It automatically fixes problems in RAG implementations</p>
+<p><strong>Correct Answer: B</strong></p>
+<p><strong>Explanation:</strong> RAGAS provides a comprehensive suite of objective metrics that evaluate different aspects of a RAG system's performance, including faithfulness, context precision, context recall, answer relevancy, and answer correctness. This allows for systematic assessment and comparison of different RAG implementations.</p>
+<h3 id="question-7-application">Question 7 [Application]</h3>
+<p><strong>In the context of RAG evaluation, what does 'Context Precision' measure?</strong></p>
+<p>A) The speed at which context is retrieved<br>
+B) The amount of context that can be processed at once<br>
+C) The proportion of retrieved context that is relevant to the question<br>
+D) The accuracy of the formatting of retrieved context</p>
+<p><strong>Correct Answer: C</strong></p>
+<p><strong>Explanation:</strong> Context Precision evaluates whether the retrieved documents are relevant to the question being asked. It measures the proportion of retrieved context that is actually useful for answering the query, with higher scores indicating more precise retrieval with less irrelevant information.</p>
+<h3 id="question-8-application">Question 8 [Application]</h3>
+<p><strong>What is a key limitation of Simple RAG that more advanced architectures aim to address?</strong></p>
+<p>A) It requires too much computational power<br>
+B) It cannot handle multiple questions at once<br>
+C) It lacks mechanisms to validate the quality of retrieved documents<br>
+D) It only works with specific language models</p>
+<p><strong>Correct Answer: C</strong></p>
+<p><strong>Explanation:</strong> Simple RAG lacks mechanisms to validate the quality of retrieved documents or adapt when retrieval fails to find relevant information. Advanced architectures like CRAG and Adaptive RAG introduce components to assess document relevance, handle retrieval failures, and adapt the processing path based on query requirements.</p>
+<h3 id="question-9-application">Question 9 [Application]</h3>
+<p><strong>In a RAG system, what is the primary role of the vector store?</strong></p>
+<p>A) To generate text responses<br>
+B) To store and index document embeddings for efficient similarity search<br>
+C) To split documents into smaller chunks<br>
+D) To translate between different languages</p>
+<p><strong>Correct Answer: B</strong></p>
+<p><strong>Explanation:</strong> In a RAG system, the vector store (often implemented as a vector database) stores and indexes document embeddings, enabling efficient similarity search when a query is received. This allows the system to quickly retrieve documents that are semantically similar to the query.</p>
+<h3 id="question-10-application">Question 10 [Application]</h3>
+<p><strong>Which RAGAS metric would be most useful for detecting when a RAG system is making up information not present in the retrieved documents?</strong></p>
+<p>A) Context Recall<br>
+B) Answer Relevancy<br>
+C) Faithfulness<br>
+D) Context Precision</p>
+<p><strong>Correct Answer: C</strong></p>
+<p><strong>Explanation:</strong> Faithfulness specifically measures whether the generated response contains only information that can be derived from the retrieved documents. A low faithfulness score indicates that the system is introducing information (hallucinating) that isn't supported by the retrieved context.</p>
+<h3 id="question-11">Question 11</h3>
+<p><strong>What is the purpose of the query rewriting component in Corrective RAG (CRAG)?</strong></p>
+<p>A) To translate the query into multiple languages<br>
+B) To improve search results when initial retrieval fails<br>
+C) To make the query shorter and easier to process<br>
+D) To correct grammatical errors in the user's query</p>
+<p><strong>Correct Answer: B</strong></p>
+<p><strong>Explanation:</strong> In CRAG, when initial retrieval doesn't yield relevant documents, the query may be rewritten to improve search results before triggering fallback mechanisms like web search. This helps optimize the retrieval process by reformulating the query to better match available information sources.</p>
+<h3 id="question-12-analysis">Question 12 [Analysis]</h3>
+<p><strong>When implementing RAG with LangGraph, what is the primary advantage of using a state machine approach?</strong></p>
+<p>A) It allows for loops and conditional branching in the RAG workflow<br>
+B) It makes the system run faster<br>
+C) It reduces the amount of code needed<br>
+D) It eliminates the need for external knowledge sources</p>
+<p><strong>Correct Answer: A</strong></p>
+<p><strong>Explanation:</strong> LangGraph enables implementing RAG as a state machine, which allows for loops and conditional branching in the workflow. This is particularly useful for implementing self-reflective RAG architectures that need to make decisions based on intermediate results and potentially loop back to earlier steps.</p>
+<h3 id="question-13-analysis">Question 13 [Analysis]</h3>
+<p><strong>What is the primary challenge addressed by using the 'Context Recall' metric in RAG evaluation?</strong></p>
+<p>A) Ensuring the response is grammatically correct<br>
+B) Verifying that all necessary information is present in the retrieved documents<br>
+C) Checking that the system can handle multiple questions at once<br>
+D) Measuring the speed of document retrieval</p>
+<p><strong>Correct Answer: B</strong></p>
+<p><strong>Explanation:</strong> Context Recall measures whether all the information needed to answer the question is present in the retrieved documents. It assesses if important information is missing from the retrieved context by calculating the proportion of claims in a reference answer that are supported by the retrieved context.</p>
+<h3 id="question-14-analysis">Question 14 [Analysis]</h3>
+<p><strong>In document processing for RAG, what is the purpose of chunk overlap?</strong></p>
+<p>A) To reduce the overall number of chunks<br>
+B) To ensure semantic continuity across chunk boundaries<br>
+C) To speed up the embedding process<br>
+D) To compress documents to save storage space</p>
+<p><strong>Correct Answer: B</strong></p>
+<p><strong>Explanation:</strong> Chunk overlap is used in document processing to ensure semantic continuity across chunk boundaries. By allowing some content to appear in multiple adjacent chunks, important contextual information spanning the boundary between chunks is less likely to be lost during retrieval.</p>
+<h3 id="question-15-analysis">Question 15 [Analysis]</h3>
+<p><strong>Which of the following best describes the relationship between 'Answer Relevancy' and 'Answer Correctness' in RAGAS?</strong></p>
+<p>A) They are the same metric with different names<br>
+B) Answer Relevancy measures topical alignment, while Answer Correctness measures factual accuracy<br>
+C) Answer Relevancy is only used for open-domain questions, while Answer Correctness is for closed-domain<br>
+D) Answer Relevancy applies to short answers, while Answer Correctness is for longer responses</p>
+<p><strong>Correct Answer: B</strong></p>
+<p><strong>Explanation:</strong> Answer Relevancy evaluates how well the generated response addresses the user's question regardless of factual accuracy, measuring if the answer is on-topic. Answer Correctness compares the generated answer with a reference (ground truth) answer to assess factual accuracy, combining semantic similarity with factual overlap.</p>
+<h3 id="question-16-analysis">Question 16 [Analysis]</h3>
+<p><strong>What key capability differentiates Adaptive RAG from Simple RAG?</strong></p>
+<p>A) The ability to use multiple language models<br>
+B) The ability to generate longer responses<br>
+C) The ability to classify queries and route them through different processing paths<br>
+D) The ability to handle multiple languages</p>
+<p><strong>Correct Answer: C</strong></p>
+<p><strong>Explanation:</strong> Adaptive RAG introduces a query classifier that analyzes the query to determine its complexity and type, then routes it through the most appropriate processing path. This dynamic routing allows the system to efficiently handle different types of queries with specialized processing approaches.</p>
+<h3 id="question-17-analysis">Question 17 [Analysis]</h3>
+<p><strong>In the context of RAG implementation with LangGraph, what is the purpose of document grading?</strong></p>
+<p>A) To assign a numerical score to each document for ranking<br>
+B) To evaluate document relevance to the query and filter irrelevant content<br>
+C) To check documents for grammatical errors<br>
+D) To translate documents into the query's language</p>
+<p><strong>Correct Answer: B</strong></p>
+<p><strong>Explanation:</strong> Document grading in RAG implementations with LangGraph involves evaluating the relevance of retrieved documents to the query. This step allows the system to filter out irrelevant content and make decisions about whether additional retrieval steps (like web search) are needed to find more relevant information.</p>
+<h3 id="question-18-recall">Question 18 [Recall]</h3>
+<p><strong>Which of the following is an advantage of CRAG over Simple RAG?</strong></p>
+<p>A) It always produces shorter, more concise answers<br>
+B) It can incorporate real-time web search when local retrieval is insufficient<br>
+C) It eliminates the need for document processing<br>
+D) It works without requiring a language model</p>
+<p><strong>Correct Answer: B</strong></p>
+<p><strong>Explanation:</strong> A key advantage of CRAG over Simple RAG is that it can incorporate real-time web search when local document retrieval is insufficient or irrelevant. This fallback mechanism helps ensure the system can access the most current and relevant information even when it's not available in the local knowledge base.</p>
+<h3 id="question-19-recalls">Question 19 [Recall]s</h3>
+<p><strong>When calculating the overall RAGAS score, what approach is typically used to combine individual metrics?</strong></p>
+<p>A) Only the lowest metric score is used<br>
+B) Only the highest metric score is used<br>
+C) An average of the component metrics is calculated<br>
+D) The product of all metrics is calculated</p>
+<p><strong>Correct Answer: C</strong></p>
+<p><strong>Explanation:</strong> The combined RAGAS score is typically calculated as an average of the component scores (Faithfulness, Context Precision, Context Recall, Answer Relevancy, and Answer Correctness), sometimes with different weights assigned based on specific application requirements.</p>
+<h3 id="question-20-analysis">Question 20 [Analysis]</h3>
+<p><strong>Which RAG architecture would be most appropriate for an application that needs to handle a wide variety of query types, from simple factual questions to complex analytical requests?</strong></p>
+<p>A) Simple RAG<br>
+B) CRAG<br>
+C) Adaptive RAG<br>
+D) Static RAG</p>
+<p><strong>Correct Answer: C</strong></p>
+<p><strong>Explanation:</strong> Adaptive RAG is designed to handle a wide variety of query types by dynamically routing them through different processing paths based on their complexity and requirements. This makes it well-suited for applications that need to efficiently handle everything from simple factual questions to complex analytical requests requiring information synthesis.</p>
+
+</body>
+</html>

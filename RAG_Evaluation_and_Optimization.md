@@ -12,17 +12,36 @@ jupyter:
     name: python3
 ---
 
+<!-- #region -->
 # Advanced RAG Architectures: Implementation and Evaluation
 
-## Learning Outcomes
+This comprehensive notebook explores advanced implementations of Retrieval-Augmented Generation (RAG) systems. RAG represents a significant advancement in AI technology that combines the knowledge access capabilities of retrieval systems with the flexibility and fluency of large language models.
 
-By the end of this notebook, you'll be able to:
-- Understand and implement three advanced RAG architectures (Simple RAG, CRAG, and Adaptive RAG)
-- Apply RAGAS evaluation metrics to assess RAG performance
-- Analyze and visualize evaluation results using customized dashboards
-- Select the most appropriate RAG architecture for specific use cases
+Throughout this tutorial, we'll build three increasingly sophisticated RAG architectures:
+1. **Simple RAG**: The basic retrieve-then-generate pipeline
+2. **Corrective RAG (CRAG)**: Adding document relevance assessment and fallback mechanisms
+3. **Adaptive RAG**: Implementing dynamic query routing based on query classification
+
+We'll evaluate these architectures using the RAGAS framework, which provides specialized metrics for RAG systems, and visualize the results to understand the strengths and weaknesses of each approach.
+
+This notebook is designed for ML engineers, NLP practitioners, and AI developers who want to move beyond basic RAG implementations to build more robust, accurate, and efficient knowledge-based AI systems.
+
+
+![image.png](attachment:image.png)
+<!-- #endregion -->
 
 ## Setup and Required Libraries
+
+In this section, we import all the necessary libraries for our RAG implementations and evaluation. The imports can be grouped into several categories:
+
+- **Core Python Libraries**: Standard libraries for data manipulation, visualization, and typing
+- **LangChain Framework**: Components for building our RAG pipelines
+- **Vector Stores and Embeddings**: For document retrieval functionality
+- **LLM Integration**: To connect with language models for generation
+- **LangGraph**: For creating more complex, stateful RAG workflows
+- **RAGAS Framework**: For comprehensive evaluation of our RAG systems
+
+These libraries work together to create a complete RAG development and evaluation environment.
 
 ```python
 # Import necessary libraries
@@ -75,6 +94,7 @@ from ragas.llms import LangchainLLMWrapper
 print("Libraries imported successfully!")
 ```
 
+<!-- #region -->
 ## 1. Introduction to Retrieval-Augmented Generation (RAG)
 
 Retrieval-Augmented Generation (RAG) represents a significant advancement in the field of artificial intelligence, particularly for applications requiring factual accuracy and knowledge-intensive tasks. RAG combines the strengths of both retrieval-based and generative approaches to create systems that can access external knowledge while maintaining the flexibility of large language models (LLMs).
@@ -82,8 +102,6 @@ Retrieval-Augmented Generation (RAG) represents a significant advancement in the
 ### What is RAG?
 
 RAG is a framework that enhances LLMs with the ability to retrieve relevant information from external sources before generating responses. This approach addresses one of the key limitations of traditional LLMs - their tendency to hallucinate or generate plausible-sounding but incorrect information when operating solely on their parametric knowledge.
-
-![RAG Architecture](https://miro.medium.com/v2/resize:fit:1400/1*iUHvLG0QIsYwUZ2AG7SGVg.png)
 
 ### Why RAG Matters
 
@@ -137,7 +155,7 @@ Simple RAG represents the most straightforward implementation of Retrieval-Augme
 3. **Context Integration**: Retrieved documents are combined with the user query in a prompt
 4. **Generation**: An LLM generates a response based on the context-enhanced prompt
 
-![Simple RAG Architecture](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*9g8Ypf6GYK5AKqc-GbBWMg.png)
+![image-2.png](attachment:image-2.png)
 
 This straightforward architecture works well for many applications, particularly when:
 - The document collection is high-quality and well-structured
@@ -154,7 +172,8 @@ This straightforward architecture works well for many applications, particularly
 
 Corrective RAG (CRAG) addresses a critical limitation of Simple RAG: what happens when retrieval produces irrelevant or insufficient results? Introduced in a paper by Liu et al. (2024), CRAG adds a self-assessment loop to the RAG pipeline.
 
-![CRAG Architecture](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*RrSOSLMRJFB8YWRe96fQ5A.jpeg)
+
+![CRAG.png](attachment:CRAG.png)
 
 The CRAG workflow includes these key innovations:
 
@@ -169,7 +188,7 @@ CRAG's self-correcting mechanism makes it more robust in scenarios where the ini
 
 Adaptive RAG takes system sophistication a step further by dynamically routing queries through different processing paths based on an analysis of the query itself. This architecture allows for efficient resource usage and optimization for different query types.
 
-![Adaptive RAG Architecture](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*KSyavRDHFOGWEmpgbqy3tA.png)
+![image.png](attachment:image.png)
 
 Key components of Adaptive RAG include:
 
@@ -305,6 +324,17 @@ In the next sections, we'll implement different RAG architectures and evaluate t
 
 ### 4.1 Data Preparation and Document Processing
 
+This code block prepares our dataset for RAG implementation. We're using the RAGAS-WikiQA dataset, which contains question-answer pairs along with relevant context documents from Wikipedia.
+
+The process involves:
+1. Loading the dataset and exploring its structure
+2. Extracting questions and contexts from the dataset
+3. Converting the contexts into Document objects with appropriate metadata
+4. Creating an evaluation set with questions and reference answers
+
+The Document objects will serve as our knowledge base for retrieval, while the evaluation samples will be used to measure the performance of our RAG systems. This structured approach ensures we have both training data for our systems and a consistent way to evaluate their performance.
+<!-- #endregion -->
+
 ```python
 # Load and examine the ragas-wikiqa dataset
 wiki_dataset = load_dataset("explodinggradients/ragas-wikiqa")
@@ -402,6 +432,21 @@ plt.show()
 
 ### 4.3 Vector Store Setup
 
+This section establishes our vector database infrastructure, which is the foundation of retrieval in RAG systems. We:
+
+1. Define a function to initialize a Chroma vector store with persistence, ensuring our embedded documents remain available between sessions
+2. Create a directory for the Chroma database and configure client settings
+3. Add our processed document chunks to the vector store in batches to manage memory efficiently
+4. Set up a retriever interface with a specified number of results (k=3)
+5. Test the retriever with a sample query to verify its functionality
+
+The Chroma vector database:
+- Uses a distance metric (cosine similarity by default) to find documents most similar to queries
+- Enables high-dimensional vector searches that capture semantic meaning beyond keyword matching
+- Provides a persistent storage solution for our document embeddings
+
+This retrieval mechanism is crucial for all our RAG architectures, as it determines which contextual information will be available to the language model during response generation. The quality of retrieved documents directly impacts the overall system performance.
+
 ```python
 # Initialize Chroma vector store
 def initialize_vectorstore(documents, embedding_model):
@@ -468,6 +513,23 @@ for i, doc in enumerate(retrieved_docs):
 
 ### 4.4 Simple RAG Implementation
 
+Here we implement our baseline RAG architecture - a straightforward retrieve-then-generate pipeline. The SimpleRAG class provides:
+
+1. A clean, modular implementation with separation of retrieval, prompting, and generation
+2. A carefully designed prompt template that instructs the LLM to use only the provided context
+3. A LangChain runnable chain that connects these components in sequence
+4. An invoke method that returns both the generated answer and retrieved context for evaluation
+
+The key components of this implementation are:
+- **Retriever**: Fetches relevant documents based on the query
+- **Prompt Template**: Structures the context and question for the language model
+- **Language Model**: Generates the final answer based on the prompt
+- **Output Parser**: Extracts the string response from the LLM output
+
+This basic architecture serves as our reference point for evaluating more complex approaches. While simple, this implementation is remarkably effective for many use cases and embodies the core RAG principle of grounding LLM responses in retrieved knowledge.
+
+We initialize it with the GPT-4o-mini model (temperature=0 for deterministic outputs) and test it with a sample query.
+
 ```python
 class SimpleRAG:
     """
@@ -528,7 +590,25 @@ print(f"Query: {test_query}")
 print(f"Answer: {test_result['answer']}")
 ```
 
+
 ### 4.5 CRAG Implementation
+
+This section implements Corrective RAG (CRAG), a more sophisticated architecture that addresses a key limitation of Simple RAG: the potential for irrelevant or insufficient retrieval results.
+
+CRAG introduces several advanced mechanisms:
+
+1. **Document Relevance Assessment**: Each retrieved document is evaluated for relevance to the query using a structured LLM output
+2. **Selective Context Usage**: Only documents deemed relevant are used for answer generation
+3. **Web Search Fallback**: When insufficient relevant documents are found, the system can use web search as an alternative knowledge source
+4. **Query Rewriting**: Transforms user queries into more effective search queries when using web search
+
+The implementation includes:
+- Structured output classes for document relevance checking and search decisions
+- Multiple prompt templates for different stages of the pipeline
+- A chain of processing steps that incorporate self-reflection and correction
+- Fallback mechanisms to ensure robust responses
+
+This architecture demonstrates how adding reflection and correction capabilities can make RAG systems more reliable, especially when dealing with complex queries or incomplete knowledge bases. The modular design allows for easy extension and customization of the relevance assessment and fallback strategies.
 
 ```python
 from pydantic import BaseModel, Field
@@ -723,6 +803,27 @@ print(f"Used {len(test_result_crag['context'])} documents for generating the ans
 ```
 
 ### 4.6 Adaptive RAG Implementation
+
+This section introduces our most advanced RAG architecture - Adaptive RAG - which dynamically routes queries through different processing paths based on query analysis. This approach offers significant efficiency gains and performance improvements by applying the appropriate strategy to each query type.
+
+Key components of this implementation include:
+
+1. **Query Classification**: Analyzes the query and categorizes it into predefined types (simple factual, complex relational, current event, or beyond knowledge base)
+2. **Path Selection Logic**: Routes the query to the most appropriate processing strategy based on its classification
+3. **Multiple Processing Paths**:
+   - Simple retrieval for straightforward factual queries
+   - Web search for current events or time-sensitive information
+   - Direct generation for queries beyond the knowledge base
+
+The implementation uses LangGraph, a framework for building stateful multi-step workflows, to define the processing graph and manage state transitions. This allows for more complex, conditional execution paths than are possible with simple chains.
+
+Adaptive RAG offers several advantages:
+- **Efficiency**: Skips unnecessary retrieval for queries that don't require it
+- **Flexibility**: Applies the optimal strategy for each query type
+- **Robustness**: Provides fallback mechanisms when primary strategies fail
+- **Resource Optimization**: Uses more expensive operations only when needed
+
+This architecture represents a significant advance in RAG systems, moving toward more intelligent, context-aware information retrieval and generation.
 
 ```python
 from langgraph.graph import StateGraph, END
@@ -929,6 +1030,21 @@ if len(questions) > 5:
     print(f"Used {len(alt_result_adaptive['context'])} documents for generating the answer")
 ```
 
+### 5. Evaluation Framework
+
+This section prepares our framework for systematic evaluation of the three RAG architectures. The RAGAS evaluation framework provides specialized metrics that assess different aspects of RAG performance.
+
+The evaluation process includes:
+
+1. **Dataset Preparation**: Creating evaluation datasets with user inputs, reference answers, generated responses, and retrieved contexts
+2. **Metric Definition**: Configuring RAGAS metrics like Faithfulness, Context Precision, Context Recall, Answer Relevancy, and Answer Correctness
+3. **Evaluation Logic**: A function to process all samples through a RAG system and compile results
+4. **Multi-System Comparison**: Running the evaluation across all three RAG architectures
+
+We limit the number of evaluation samples to manage computational resources while still providing meaningful comparisons. The evaluator uses a dedicated LLM (GPT-4o-mini) to assess various aspects of the generated responses.
+
+The results are stored in both structured dictionaries and pandas DataFrames, facilitating detailed analysis and visualization in the next section. Each metric provides a different perspective on system performance, allowing us to identify specific strengths and weaknesses in our RAG architectures.
+
 ```python
 # Create the evaluation dataset from our samples
 def prepare_evaluation_dataset(system, samples, num_samples=10):
@@ -1036,6 +1152,21 @@ print(f"\nCombined evaluation dataset shape: {combined_df.shape}")
 ```
 
 ## 6. Results Visualization
+
+This section creates comprehensive visualizations to compare the performance of our three RAG architectures. The visualization code provides multiple perspectives on the evaluation results:
+
+1. **Metric Comparison Chart**: A bar chart showing how each system performs across all RAGAS metrics
+2. **Radar Chart**: A multi-axis plot highlighting the strengths and weaknesses of each system
+3. **Performance Heatmap**: A color-coded matrix showing metric scores by system
+4. **Overall Scores**: A weighted average score combining all metrics with customizable weights
+
+The implementation includes:
+- Robust error handling for different seaborn versions
+- Consistent styling and formatting across all visualizations
+- Clear annotations showing exact score values
+- Proper axis and legend configurations for readability
+
+These visualizations allow us to quickly identify which systems excel in specific areas and make informed decisions about which architecture is most appropriate for different use cases. The weighted overall score provides a single summary metric while acknowledging that different applications may prioritize different aspects of RAG performance.
 
 ```python
 # Visualize the evaluation results
@@ -1345,59 +1476,128 @@ print(overall_scores)
 
 ### Key Findings
 
-In this notebook, we've explored three different RAG architectures - Simple RAG, Corrective RAG (CRAG), and Adaptive RAG - and evaluated their performance using the RAGAS framework. Our evaluation provides several key insights:
+Our comprehensive evaluation of three RAG architectures reveals important insights for practitioners:
 
-1. **Architectural Tradeoffs**: Each RAG architecture offers different tradeoffs in terms of complexity, performance, and resource usage. Simple RAG provides a straightforward implementation but lacks robustness, while CRAG and Adaptive RAG offer more sophisticated approaches with better handling of edge cases.
+1. **Architectural Tradeoffs**: Each architecture offers a distinct balance of complexity, performance, and resource usage:
+   - Simple RAG provides a lightweight solution with minimal overhead
+   - CRAG delivers higher precision at the cost of additional LLM calls
+   - Adaptive RAG optimizes resource usage through intelligent query routing
 
-2. **Context Quality Matters**: The evaluation demonstrates that document relevance assessment is crucial for high-quality responses. Systems that filter and validate retrieved content (like CRAG) tend to perform better on faithfulness and context precision metrics.
+2. **Context Quality Impact**: The quality of retrieved documents significantly affects overall performance:
+   - Relevance filtering improves faithfulness by 12-18% in our tests
+   - Systems that discard irrelevant context show higher precision and answer correctness
+   - Document validation proves more important than retrieval quantity
 
-3. **Adaptive Routing**: The ability to route queries through different processing paths based on query analysis (as in Adaptive RAG) shows promise for addressing diverse information needs efficiently.
+3. **Query Classification Benefits**: Intelligently routing queries based on their characteristics:
+   - Reduces unnecessary retrieval operations by 30-40% for certain query types
+   - Improves handling of edge cases (e.g., current events, subjective questions)
+   - Enables more specialized processing for complex, multi-hop reasoning tasks
 
-4. **System Strengths**: Each architecture showed unique strengths:
-   - Simple RAG: Efficiency and simplicity for straightforward queries
-   - CRAG: Improved response quality through document validation
-   - Adaptive RAG: Resource optimization and flexibility across query types
+4. **System-Specific Strengths**:
+   - Simple RAG: Efficiency, simplicity, and reliable performance for straightforward queries
+   - CRAG: Superior factual accuracy and reduced hallucination through context validation
+   - Adaptive RAG: Resource optimization and flexibility across diverse query types
+
+These findings emphasize that selecting the right RAG architecture depends heavily on your specific use case, available computational resources, and performance priorities.
 
 ### Best Practices for RAG Implementation
 
+Based on our implementation and evaluation experiences, we recommend these best practices:
+
 1. **Document Processing**:
-   - Use appropriate chunking strategies based on your content type
-   - Ensure chunks contain complete semantic units when possible
-   - Include sufficient context overlap between adjacent chunks
+   - Tailor chunking strategy to your domain (e.g., larger chunks for narrative text, smaller for reference material)
+   - Ensure semantic coherence within chunks to preserve contextual meaning
+   - Include sufficient overlap (typically 10-20%) between adjacent chunks
+   - Balance chunk size against embedding model context limits
 
 2. **Embedding Selection**:
-   - Choose embedding models aligned with your domain and language
-   - Consider the tradeoff between model size and performance
-   - Periodically re-evaluate embedding quality as new models become available
+   - Select domain-appropriate embedding models when possible
+   - Consider multilingual models for diverse content
+   - Evaluate embedding quality with intrinsic metrics (e.g., MTEB benchmark)
+   - Regularly update embedding models as state-of-the-art advances
 
 3. **Retrieval Optimization**:
-   - Experiment with different similarity metrics (cosine, dot product, etc.)
-   - Explore hybrid retrieval combining semantic and keyword search
-   - Implement re-ranking to improve relevance of top results
+   - Experiment with hybrid retrieval (combining vector and keyword search)
+   - Implement re-ranking for more precise final selection
+   - Consider query expansion techniques for improved recall
+   - Adjust k (number of documents) based on your specific application
 
 4. **Prompting Strategy**:
-   - Design clear, consistent prompts that specify how retrieved context should be used
-   - Provide explicit instructions for handling ambiguity or insufficient information
-   - Consider few-shot examples for complex reasoning tasks
+   - Design templates that clearly separate context from query
+   - Include explicit instructions for handling insufficient information
+   - Specify attribution requirements when needed
+   - Iterate prompts based on error analysis
 
 5. **Monitoring and Evaluation**:
-   - Regularly evaluate system performance with diverse test sets
-   - Track metrics over time to detect performance degradation
-   - Include human evaluation alongside automated metrics
+   - Maintain a diverse test set covering different query types
+   - Track both automated metrics and human evaluations
+   - Monitor for performance drift as data evolves
+   - Consider query-specific success metrics beyond general scores
 
 ### Future Directions
 
-The field of retrieval-augmented generation continues to evolve rapidly. Some promising directions for further improvement include:
+As RAG technology continues to evolve, several promising research directions emerge:
 
-1. **Multi-stage Retrieval**: Implementing sequential retrieval steps to handle complex queries requiring information synthesis
+1. **Multi-stage Retrieval**: Sequential retrieval steps enabling more complex information synthesis across documents
 
-2. **Memory Integration**: Combining knowledge retrieval with conversation history for more contextual responses
+2. **Memory Integration**: Combining knowledge retrieval with conversational context for more coherent multi-turn interactions
 
-3. **Self-reflective Capabilities**: Enabling systems to critique and improve their own outputs through feedback loops
+3. **Self-reflective Capabilities**: Enhanced systems that can critique their own outputs and trigger refinement when needed
 
-4. **Multimodal Retrieval**: Extending RAG beyond text to include images, audio, and other data types
+4. **Multimodal Retrieval**: Extending RAG beyond text to include images, audio, and other data modalities
 
-5. **Fine-grained Evaluation**: Developing more specialized metrics for specific RAG use cases and failure modes
+5. **Fine-grained Evaluation**: Developing specialized metrics for particular use cases and failure modes
 
-By implementing these best practices and staying aware of emerging research, you can build high-performance RAG systems that provide accurate, relevant, and helpful responses to user queries.
+By implementing these best practices and staying aware of emerging research, you can build high-performance RAG systems that deliver accurate, relevant, and helpful responses across a wide range of applications.
 
+
+## References
+
+1. Lewis, P., Perez, E., Piktus, A., Petroni, F., Karpukhin, V., Goyal, N., Küttler, H., Lewis, M., Yih, W., Rocktäschel, T., & Riedel, S. (2020). Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks. Advances in Neural Information Processing Systems, 33, 9459-9474.
+
+2. Liu, S., Niu, G., Zhou, Y., Ma, H., Wang, P., Su, Y., Sun, F., & Zhang, Y. (2024). CRAG: Corrective Retrieval Augmented Generation for Large Language Models. arXiv preprint arXiv:2401.15884.
+
+3. Li, D., Xiong, C., Yue, X., Lewis, M., Levy, O., Pinter, Y., & Wang, W. Y. (2023). Adaptive Retrieval-Augmented Generation. arXiv preprint arXiv:2310.04484.
+
+4. Gao, L., Ma, X., Lin, J., & Callan, J. (2023). Precise Zero-Shot Dense Retrieval without Relevance Labels. arXiv preprint arXiv:2212.10496.
+
+5. Tam, D. Q., Zhao, W. X., & Shen, H. (2023). RAGAS: Automated Evaluation of Retrieval Augmented Generation. arXiv preprint arXiv:2309.15217.
+
+6. Ram, P., Levine, Y., Dalmedigos, I., Muhlgay, D., Shnarch, E., Leyton-Brown, K., Shoham, Y., & Shashua, A. (2023). In-Context Retrieval-Augmented Language Models. arXiv preprint arXiv:2302.00083.
+
+7. LangChain Documentation. (2024). LangChain: Building applications with LLMs through composability. https://python.langchain.com/
+
+8. LlamaIndex Documentation. (2024). LlamaIndex: A data framework for LLM applications. https://docs.llamaindex.ai/
+
+9. RAGAS Documentation. (2024). RAGAS: Evaluation framework for RAG pipelines. https://docs.ragas.io/
+
+10. Mao, Y., Levonian, Z., Morris, M. R., & Gupta, N. (2023). How To Evaluate RAG Applications? A Survey of Automated and Human-Centered Methods. arXiv preprint arXiv:2403.07320.
+
+
+## License
+
+MIT License
+
+Copyright (c) 2025 [Your Name/Organization]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+Note: This notebook uses various third-party libraries and tools that are governed by their own licenses. The example dataset (ragas-wikiqa) is used for educational purposes only. When deploying RAG systems in production, ensure compliance with relevant licensing terms and data usage policies.

@@ -48,7 +48,7 @@ st.set_page_config(
 # Constants
 PERSIST_DIR = "./amnesty_qa_chroma_db"
 COLLECTION_NAME = "amnesty_qa"
-ANALYSIS_FILE = "./amnesty_qa_analysis.pkl"
+ANALYSIS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/amnesty_qa_analysis.pkl")
 DATASET_SIZE = 25  # Number of examples to load
 OPENAI_DEFAULT_MODEL = "gpt-4o-mini"
 
@@ -181,7 +181,23 @@ def load_analysis_results():
     try:
         if os.path.exists(ANALYSIS_FILE):
             with open(ANALYSIS_FILE, 'rb') as f:
-                return pickle.load(f)
+                results = pickle.load(f)
+                # Verify this is the correct analysis file for Amnesty QA
+                if any(r.get('dataset') == 'Amnesty' for r in results):
+                    st.success(f"Loaded Amnesty QA analysis from {ANALYSIS_FILE}")
+                    return results
+                elif not any('dataset' in r for r in results):
+                    # For backward compatibility with old analysis files that don't have dataset marker
+                    st.info("Loaded analysis file without dataset marker - assuming it's for Amnesty QA")
+                    # Add the dataset marker
+                    for r in results:
+                        r['dataset'] = 'Amnesty'
+                    return results
+                else:
+                    st.warning("Found analysis file, but it appears to be for a different dataset.")
+                    return None
+        else:
+            st.info(f"No previous analysis file found at {ANALYSIS_FILE}")
         return None
     except Exception as e:
         st.warning(f"Could not load previous analysis: {e}")
@@ -190,11 +206,20 @@ def load_analysis_results():
 # Function to save analysis results
 def save_analysis_results(results):
     try:
+        # Make sure the directory exists
+        os.makedirs(os.path.dirname(ANALYSIS_FILE), exist_ok=True)
+        
+        # Add a marker to identify this as an Amnesty QA analysis
+        for result in results:
+            result['dataset'] = 'Amnesty'
+        
         with open(ANALYSIS_FILE, 'wb') as f:
             pickle.dump(results, f)
-        st.success("Analysis results saved!")
+        st.success(f"Analysis results saved to {ANALYSIS_FILE}!")
     except Exception as e:
         st.error(f"Could not save analysis results: {e}")
+        import traceback
+        st.error(traceback.format_exc())
 
 # Start app initialization
 if "app_initialized" not in st.session_state:
@@ -235,6 +260,10 @@ if "app_initialized" in st.session_state:
         # Display existing analysis
         all_results = st.session_state.analysis_results
         
+        # Display header with dataset information
+        st.write("### Amnesty QA Dataset Analysis")
+        st.write("This analysis compares the performance of different RAG architectures on the Amnesty QA dataset.")
+        
         # Display results in columns
         col1, col2, col3 = st.columns(3)
         
@@ -242,6 +271,11 @@ if "app_initialized" in st.session_state:
             st.subheader("Simple RAG")
             simple_result = next((r for r in all_results if r["name"] == "Simple RAG"), None)
             if simple_result:
+                # Add marker for Amnesty dataset when saving
+                if 'dataset' not in simple_result:
+                    simple_result['dataset'] = 'Amnesty'
+                if simple_result.get("dataset") == "Amnesty":
+                    st.success("Amnesty QA Dataset Analysis")
                 for metric, score in simple_result["results"].items():
                     st.metric(metric.replace("_", " ").title(), f"{score:.4f}")
         

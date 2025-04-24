@@ -49,7 +49,7 @@ st.set_page_config(
 # Constants
 PERSIST_DIR = "./huggingface_doc_chroma_db"
 COLLECTION_NAME = "huggingface_doc"
-ANALYSIS_FILE = "./huggingface_doc_analysis.pkl"
+ANALYSIS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../data/huggingface_doc_analysis.pkl")
 DATASET_SIZE = 20  # Number of examples to load
 OPENAI_DEFAULT_MODEL = "gpt-4o-mini"
 
@@ -369,7 +369,23 @@ def load_analysis_results():
     try:
         if os.path.exists(ANALYSIS_FILE):
             with open(ANALYSIS_FILE, 'rb') as f:
-                return pickle.load(f)
+                results = pickle.load(f)
+                # Verify this is the correct analysis file for HuggingFace
+                if any(r.get('dataset') == 'HuggingFace' for r in results):
+                    st.success(f"Loaded HuggingFace analysis from {ANALYSIS_FILE}")
+                    return results
+                elif not any('dataset' in r for r in results):
+                    # For backward compatibility with old analysis files that don't have dataset marker
+                    st.info("Loaded analysis file without dataset marker - assuming it's for HuggingFace")
+                    # Add the dataset marker
+                    for r in results:
+                        r['dataset'] = 'HuggingFace'
+                    return results
+                else:
+                    st.warning("Found analysis file, but it appears to be for a different dataset.")
+                    return None
+        else:
+            st.info(f"No previous analysis file found at {ANALYSIS_FILE}")
         return None
     except Exception as e:
         st.warning(f"Could not load previous analysis: {e}")
@@ -378,11 +394,20 @@ def load_analysis_results():
 # Function to save analysis results
 def save_analysis_results(results):
     try:
+        # Make sure the directory exists
+        os.makedirs(os.path.dirname(ANALYSIS_FILE), exist_ok=True)
+        
+        # Add a marker to identify this as a HuggingFace analysis
+        for result in results:
+            result['dataset'] = 'HuggingFace'
+        
         with open(ANALYSIS_FILE, 'wb') as f:
             pickle.dump(results, f)
-        st.success("Analysis results saved!")
+        st.success(f"Analysis results saved to {ANALYSIS_FILE}!")
     except Exception as e:
         st.error(f"Could not save analysis results: {e}")
+        import traceback
+        st.error(traceback.format_exc())
 
 # Start app initialization
 if "app_initialized" not in st.session_state:
@@ -450,6 +475,10 @@ if "app_initialized" in st.session_state and not st.session_state.get("needs_qa_
         # Display existing analysis
         all_results = st.session_state.analysis_results
         
+        # Display header with dataset information
+        st.write("### HuggingFace Documentation Dataset Analysis")
+        st.write("This analysis compares the performance of different RAG architectures on the HuggingFace documentation dataset.")
+        
         # Display results in columns
         col1, col2, col3 = st.columns(3)
         
@@ -457,6 +486,9 @@ if "app_initialized" in st.session_state and not st.session_state.get("needs_qa_
             st.subheader("Simple RAG")
             simple_result = next((r for r in all_results if r["name"] == "Simple RAG"), None)
             if simple_result:
+                # Check if this is a HuggingFace analysis
+                if simple_result.get("dataset") == "HuggingFace":
+                    st.success("HuggingFace Dataset Analysis")
                 for metric, score in simple_result["results"].items():
                     st.metric(metric.replace("_", " ").title(), f"{score:.4f}")
         
